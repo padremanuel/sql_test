@@ -9,25 +9,25 @@
 
 /*таблица процедуры*/
 CREATE TABLE IF NOT EXISTS procs (
-  proc_id int(11) NOT NULL AUTO_INCREMENT,
+  id int(11) NOT NULL AUTO_INCREMENT,
   proc_name varchar(60) CHARACTER SET utf8 NOT NULL,
-  PRIMARY KEY (proc_id)
+  PRIMARY KEY (id)
 );
 
 /*таблица лоты*/
 CREATE TABLE IF NOT EXISTS lots (
-  lot_id int(11) NOT NULL AUTO_INCREMENT,
-  proc_id int(11) NOT NULL REFERENCES procs(proc_id),
+  Id int(11) NOT NULL AUTO_INCREMENT,
+  procedure_id int(11) NOT NULL REFERENCES procs(id),
   price double NOT NULL,
-  PRIMARY KEY (lot_id)
+  PRIMARY KEY (Id)
 );
 
 /*таблица позиции*/
 CREATE TABLE IF NOT EXISTS pozs (
-  poz_id int(11) NOT NULL AUTO_INCREMENT,
-  lot_id int(11) NOT NULL REFERENCES lots(lot_id),
+  Id int(11) NOT NULL AUTO_INCREMENT,
+  lot_id int(11) NOT NULL REFERENCES lots(Id),
   poz_count int(11) NOT NULL,
-  PRIMARY KEY (poz_id)
+  PRIMARY KEY (Id)
 );
 
 /*заполнение процедур*/
@@ -38,7 +38,7 @@ INSERT INTO procs (proc_name) VALUES
 ;
 
 /*заполнение лотов*/
-INSERT INTO lots (proc_id, price) VALUES
+INSERT INTO lots (procedure_id, price) VALUES
 (2, 17),
 (2, 0.5),
 (2, 100),
@@ -65,10 +65,10 @@ INSERT INTO pozs (lot_id, poz_count) VALUES
 SELECT
 	procs.proc_name 'наименование процедуры', SUM(price) 'суммарная стоимость лотов', SUM(count_pozs) 'суммарное количество позиций'
 	FROM
-	(SELECT proc_id, price, (
+	(SELECT procedure_id, price, (
 		SELECT SUM(poz_count)
 			FROM pozs
-			WHERE pozs.lot_id = L.lot_id) AS 'count_pozs'
+			WHERE pozs.lot_id = L.Id) AS 'count_pozs'
 		FROM lots as L) as C
-JOIN procs ON procs.proc_id=C.proc_id
+JOIN procs ON procs.id=C.procedure_id
 GROUP BY procs.proc_name;
